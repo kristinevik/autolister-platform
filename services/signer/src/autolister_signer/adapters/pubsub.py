@@ -12,7 +12,9 @@ from collections.abc import Sequence
 from typing import Any
 
 from google.api_core.exceptions import DeadlineExceeded
-from google.cloud import pubsub_v1
+
+# Imported from the submodule: google.cloud.pubsub_v1 ships without type information.
+from google.cloud.pubsub_v1 import SubscriberClient
 
 from ..ports import ReceivedMessage
 
@@ -21,7 +23,7 @@ PULL_TIMEOUT_S = 30.0
 
 class PubSubSource:
     def __init__(self, project: str, subscription: str, client: Any = None) -> None:
-        self._client = client or pubsub_v1.SubscriberClient()
+        self._client = client or SubscriberClient()
         self._path = self._client.subscription_path(project, subscription)
 
     def pull(self, max_messages: int) -> list[ReceivedMessage]:

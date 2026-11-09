@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from google.cloud import pubsub_v1
+# Imported from the submodule: google.cloud.pubsub_v1 ships without type information.
+from google.cloud.pubsub_v1 import PublisherClient
+from google.cloud.pubsub_v1.types import PublisherOptions
 
 from autolister_core.instructions import Instruction, seal
 
@@ -17,8 +19,8 @@ PUBLISH_TIMEOUT_S = 30.0
 
 class PubSubPublisher:
     def __init__(self, project: str, topic: str, hmac_key: bytes, client: Any = None) -> None:
-        self._client = client or pubsub_v1.PublisherClient(
-            publisher_options=pubsub_v1.types.PublisherOptions(enable_message_ordering=True)
+        self._client = client or PublisherClient(
+            publisher_options=PublisherOptions(enable_message_ordering=True)
         )
         self._topic = self._client.topic_path(project, topic)
         self._key = hmac_key

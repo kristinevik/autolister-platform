@@ -51,15 +51,16 @@ jobs:
       matrix:
         service: [engine, signer]
     env:
-      # Repository secrets, set from `terraform output` (see docs/runbook.md).
-      IMAGE: ${{ secrets.ARTIFACT_REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
+      # Publish from main once the registry exists and its secrets are set
+      # (docs/runbook.md, first-time setup). Until then, CI only builds.
+      PUBLISH: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.WORKLOAD_IDENTITY_PROVIDER != '' }}
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: docker build --file services/${{ matrix.service }}/Dockerfile --tag "$IMAGE" .
+        run: docker build --file services/${{ matrix.service }}/Dockerfile --tag autolister-${{ matrix.service }} .
       - name: Authenticate to Google Cloud
         id: auth
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: env.PUBLISH == 'true'
         uses: google-github-actions/auth@v0
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
@@ -74,4 +75,8 @@ jobs:
           password: ${{ steps.auth.outputs.access_token }}
       - name: Push
         if: steps.auth.outcome == 'success'
-        run: docker push "$IMAGE"
+        env:
+          IMAGE: ${{ secrets.ARTIFACT_REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
+        run: |
+          docker tag autolister-${{ matrix.service }} "$IMAGE"
+          docker push "$IMAGE"

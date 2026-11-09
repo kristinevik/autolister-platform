@@ -1,0 +1,30 @@
+# Strategy parameters. Reviewed like code: every change goes through a pull request.
+# Percentages are relative to the floor price.
+strategy:
+  collection_address: "0x34d85c9CDeB23FA97cb08333b511ac86E1C4E258"  # Otherdeed for Otherside
+
+  # Pricing
+  target_premium_pct: "7.0"              # preferred price above the global floor
+  premium_step_pct: "0.3"                # step used to clear the LooksRare floor
+  min_premium_over_looksrare_pct: "3.0"  # minimum clearance over the LooksRare floor
+  rewards_ceiling_pct: "10.0"            # above this, listings earn no rewards
+
+  # Cancellation triggers
+  cancel_below_global_pct: "3.0"
+  cancel_below_looksrare_pct: "1.5"
+  cancel_rank: 25                        # cancel with fewer cheaper listings in front
+  rank_buffer: 5                         # new listings keep cancel_rank + rank_buffer in front
+
+  # Safety
+  emergency_stop_rank: 20                # never list below the 21st cheapest ask (signer re-checks)
+  sharp_drop_ratio: "0.95"
+  settle_delay_s: 60
+  sharp_drop_extra_delay_s: 60
+  post_sale_cooldown_min: 10
+  rewards_top_n: 5
+
+  # Orders
+  listing_duration_days: 3
+  renew_before_expiry_min: 65
+  listings_to_scan: 200
+  min_price_to_scan_wei: 100000000000000000  # 0.1 ETH

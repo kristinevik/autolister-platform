@@ -1,0 +1,11 @@
+# The investor wallets under management, and the tokens in each that the system
+# trades. Changes go through a pull request, like code, and ship in the images.
+# Private keys are never here: the signer reads each one from Secret Manager as
+# "wallet-<id>" (see docs/runbook.md, "Add an account").
+accounts:
+  - id: investor-1
+    address: "0x0000000000000000000000000000000000000001"
+    token_ids: ["1234", "5678"]
+  - id: investor-2
+    address: "0x0000000000000000000000000000000000000002"
+    token_ids: ["9012"]

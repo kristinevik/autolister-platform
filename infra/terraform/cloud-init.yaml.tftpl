@@ -1,0 +1,41 @@
+#cloud-config
+# Runs the ${service} container under systemd, as Google documents for
+# Container-Optimized OS. The container runs as an unprivileged user, on a
+# read-only filesystem, with every Linux capability dropped.
+
+write_files:
+  - path: /etc/autolister/${service}.env
+    permissions: "0644"
+    owner: root
+    content: |
+%{ for name, value in env ~}
+      ${name}=${value}
+%{ endfor ~}
+  - path: /etc/systemd/system/autolister-${service}.service
+    permissions: "0644"
+    owner: root
+    content: |
+      [Unit]
+      Description=Autolister ${service}
+      Wants=gcr-online.target
+      After=gcr-online.target
+
+      [Service]
+      Environment=HOME=/home/autolister
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries=${registry_host}
+      ExecStartPre=-/usr/bin/docker rm --force autolister-${service}
+      ExecStart=/usr/bin/docker run --rm --name=autolister-${service} \
+        --env-file=/etc/autolister/${service}.env \
+        --volume=/var/lib/autolister:/var/lib/autolister \
+        --read-only --tmpfs=/tmp \
+        --cap-drop=ALL --security-opt=no-new-privileges \
+        ${image}
+      ExecStop=/usr/bin/docker stop autolister-${service}
+      Restart=always
+      RestartSec=10
+
+runcmd:
+  - mkdir -p /home/autolister /var/lib/autolister
+  - chown 10001:10001 /var/lib/autolister
+  - systemctl daemon-reload
+  - systemctl start autolister-${service}.service

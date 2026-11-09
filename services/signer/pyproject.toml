@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autolister-signer"
+version = "1.0.0"
+description = "Autolister signer: verifies instructions and signs orders. The only component with wallet keys."
+requires-python = ">=3.10"
+dependencies = [
+    "autolister-core",
+    "eth-abi>=2.2,<3",
+    "eth-account>=0.5.9,<0.6",
+    "google-cloud-pubsub>=2.13,<3",
+    "google-cloud-secret-manager>=2.12,<3",
+    "pydantic>=1.10,<2",
+    "python-json-logger>=2.0,<3",
+    "PyYAML>=6.0,<7",
+    "requests>=2.28,<3",
+    "web3>=5.31,<6",
+]
+
+[project.scripts]
+autolister-signer = "autolister_signer.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Formatting is the same everywhere. It is repeated here because black and isort
+# stop looking for settings at the first pyproject.toml they find.
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["autolister_core", "autolister_engine", "autolister_signer"]
+known_local_folder = ["tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers --strict-config"
+log_level = "INFO"
+filterwarnings = [
+    "error",
+    # web3 5.31 still calls the eth-abi functions that eth-abi 2.2 deprecates.
+    "ignore:abi\\.(encode|decode)_abi:DeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["autolister_signer"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "^\\s*\\.\\.\\.$"]  # protocol method stubs
+show_missing = true
+skip_covered = true
+fail_under = 90

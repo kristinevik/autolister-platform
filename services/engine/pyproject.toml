@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autolister-engine"
+version = "1.0.0"
+description = "Autolister pricing engine: watches the market and decides prices. Holds no keys."
+requires-python = ">=3.10"
+dependencies = [
+    "autolister-core",
+    "google-cloud-pubsub>=2.13,<3",
+    "google-cloud-secret-manager>=2.12,<3",
+    "pydantic>=1.10,<2",
+    "python-json-logger>=2.0,<3",
+    "PyYAML>=6.0,<7",
+    "requests>=2.28,<3",
+]
+
+[project.scripts]
+autolister-engine = "autolister_engine.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Formatting is the same everywhere. It is repeated here because black and isort
+# stop looking for settings at the first pyproject.toml they find.
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["autolister_core", "autolister_engine", "autolister_signer"]
+known_local_folder = ["tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers --strict-config"
+log_level = "INFO"
+filterwarnings = [
+    "error",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["autolister_engine"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "^\\s*\\.\\.\\.$"]  # protocol method stubs
+show_missing = true
+skip_covered = true
+fail_under = 90

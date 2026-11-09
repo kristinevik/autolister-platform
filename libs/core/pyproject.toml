@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autolister-core"
+version = "1.0.0"
+description = "What both Autolister services share: the instruction protocol, the emergency stop, accounts and money."
+requires-python = ">=3.10"
+dependencies = ["pydantic>=1.10,<2", "PyYAML>=6.0,<7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+autolister_core = ["py.typed"]
+
+# Formatting is the same everywhere. It is repeated here because black and isort
+# stop looking for settings at the first pyproject.toml they find.
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["autolister_core", "autolister_engine", "autolister_signer"]
+known_local_folder = ["tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers --strict-config"
+log_level = "INFO"
+filterwarnings = [
+    "error",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["autolister_core"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "^\\s*\\.\\.\\.$"]  # protocol method stubs
+show_missing = true
+skip_covered = true
+fail_under = 90

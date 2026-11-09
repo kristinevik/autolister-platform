@@ -1,0 +1,11 @@
+# Images are built from the repository root; only these paths are sent to Docker.
+*
+!config/
+!libs/core/
+!services/engine/
+!services/signer/
+**/__pycache__
+**/*.egg-info
+**/.pytest_cache
+**/.hypothesis
+**/tests

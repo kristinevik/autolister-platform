@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars (which git ignores) and fill in.
+project_id        = "your-project-id"
+image_tag         = "0123abc" # the commit CI built
+github_repository = "your-org/autolister"
+alert_email       = "oncall@example.com"
+operators         = ["group:oncall@example.com"]
